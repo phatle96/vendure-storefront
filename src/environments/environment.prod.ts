@@ -1,6 +1,6 @@
 export const environment = {
     production: true,
-    apiHost: 'http://46.250.237.108',
+    apiHost: 'http://vendure-dev.innity.com.my',
     apiPort: 3000,
     shopApiPath: 'shop-api',
     baseHref: '/',
