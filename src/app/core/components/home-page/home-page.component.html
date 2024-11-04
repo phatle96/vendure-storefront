@@ -32,6 +32,15 @@
         </div>
     </div>
 </div>
+
+<p-sidebar [(visible)]="sidebarVisible" [modal]="false" position="bottom" [style]="{height:'8rem'}" *ngIf="permission !== 'granted'">
+    <ng-template pTemplate="header"></ng-template>
+    <ng-template pTemplate="content">Receive new offers from website!</ng-template>
+    <ng-template pTemplate="footer">
+        <p-button label="No" severity="info" (click)="sidebarVisible = false" [style]="{padding:'0 5px 0 5px'}"></p-button>
+        <p-button label="Yes, of course." severity="secondary" (click)="sidebarVisible = false; this.fcmService.enableNotifications()"></p-button>
+    </ng-template>
+</p-sidebar>
 <div class="max-w-6xl mx-auto px-4 pt-12">
     <div class="box-content py-2 px-2 relative overflow-x-auto xl:overflow-visible">
         <div

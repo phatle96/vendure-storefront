@@ -12,6 +12,9 @@ import { SharedModule } from './shared/shared.module';
 
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { SidebarModule } from 'primeng/sidebar';
+import { ButtonModule } from 'primeng/button';
+
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
@@ -30,6 +33,8 @@ import { environment } from 'src/environments/environment';
         CoreModule,
         SharedModule,
         ToastModule,
+        SidebarModule,
+        ButtonModule,
         BrowserAnimationsModule,
         provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
         provideMessaging(() => getMessaging()),

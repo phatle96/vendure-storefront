@@ -23,8 +23,7 @@
               "src/robots.txt",
               "src/assets",
               "src/storefront-config.json",
-              "src/manifest.json",
-              "src/firebase-messaging-sw.js"
+              "src/manifest.json"
             ],
             "styles": [
               "src/styles/styles.scss",
