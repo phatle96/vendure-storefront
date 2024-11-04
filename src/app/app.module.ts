@@ -14,6 +14,10 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideMessaging, getMessaging } from '@angular/fire/messaging';
+import { environment } from 'src/environments/environment';
+
 
 @NgModule({
     declarations: [
@@ -26,14 +30,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         CoreModule,
         SharedModule,
         ToastModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+        provideMessaging(() => getMessaging()),
         // Using the service worker appears to break SSR after the initial page load.
         // ServiceWorkerModule.register(`${environment.baseHref}ngsw-worker.js`, {
         //     enabled: environment.production,
         //     registrationStrategy: 'registerWithDelay:5000',
         // }),
     ],
-    providers:[MessageService],
+    providers: [MessageService],
     bootstrap: [AppComponent],
 })
 export class AppModule {
