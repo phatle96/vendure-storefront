@@ -45,7 +45,7 @@
     "express": "^4.15.2",
     "graphql": "^16.6.0",
     "photoswipe": "^5.3.4",
-    "primeng": "^15.4.1",
+    "primeng": "^16.9.1",
     "rxjs": "~6.6.3",
     "tslib": "^2.4.0",
     "utf-8-validate": "^5.0.10",
