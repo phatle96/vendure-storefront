@@ -8,6 +8,10 @@ import { DataService } from '../../providers/data/data.service';
 import { StateService } from '../../providers/state/state.service';
 
 import { NovuSocketService } from '../../services/novu-socket.service';
+import { NovuApiService } from '../../services/novu-api.service';
+import { FcmService } from '../../services/fcm.service';
+import { ISuscriberQueryResponse } from '../../services/novu-api.type';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'vsf-account-link',
@@ -21,7 +25,8 @@ export class AccountLinkComponent implements OnInit {
     constructor(
         private dataService: DataService,
         private stateService: StateService,
-        private novuSocketService: NovuSocketService
+        private novuSocketService: NovuSocketService,
+        private novuApiService: NovuApiService,
     ) { }
 
     ngOnInit() {
@@ -30,7 +35,39 @@ export class AccountLinkComponent implements OnInit {
         getActiveCustomer$.pipe(take(1)).subscribe(data => {
             if (data.activeCustomer) {
                 this.stateService.setState('signedIn', true);
+                this.stateService.setState('userId', data.activeCustomer.id);
                 this.novuSocketService.init(data.activeCustomer.id);
+
+                this.novuApiService.getSubscriber(data.activeCustomer.id).subscribe(
+
+                    (result: ISuscriberQueryResponse) => {
+                        if (!result.errors && result.data?.subscriberQuery) {
+                            // Set user FCM device token
+                            const channels = result.data.subscriberQuery.channels
+                            if (channels && channels.length > 0) {
+                                const fcmChannel = channels.filter((channel) => channel.providerId == "fcm")
+                                if (fcmChannel.length && fcmChannel[0].credentials) {
+                                    this.stateService.setState('fcmDeviceTokens', fcmChannel[0].credentials.deviceTokens!)
+                                    this.stateService.select(state => state.deviceToken).subscribe(
+                                        (deviceToken) => {
+                                            let tokens = fcmChannel[0].credentials?.deviceTokens
+                                            if (deviceToken && tokens?.length) {
+                                                if (!tokens.includes(deviceToken)) {
+                                                    tokens = [...tokens.slice(-10), deviceToken]
+                                                    this.novuApiService.updateSubscriberCredentials(data.activeCustomer!.id, "fcm", tokens, environment.pushProviderIdentifier).subscribe()
+                                                }
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+
+                        }
+                    },
+                    (error) => {
+                        console.log("🚀 ~ AccountLinkComponent ~ getActiveCustomer$.pipe ~ error:", error)
+                    }
+                )
             }
         });
 

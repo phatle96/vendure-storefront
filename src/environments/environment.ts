@@ -4,7 +4,8 @@
 
 export const environment = {
     production: false,
-    apiHost: 'http://vendure-dev.innity.com.my',
+    // apiHost: 'http://vendure-dev.innity.com.my',
+    apiHost: 'http://localhost',
     apiPort: 3000,
     shopApiPath: 'shop-api',
     baseHref: '/',
@@ -19,7 +20,8 @@ export const environment = {
         appId: "1:1012751272104:web:99208b08353d836e83da9d",
         measurementId: "G-ZE6GH5CP63"
     },
-    vapid: 'BOYrCE0eSsMi2FXzA_A7za4qGGK6CX_RmNauyPocdyyoiWZlhls6B8YRnl0W1TWiJrN4xobuOXXyycTvWCwJJno'
+    vapid: 'BOYrCE0eSsMi2FXzA_A7za4qGGK6CX_RmNauyPocdyyoiWZlhls6B8YRnl0W1TWiJrN4xobuOXXyycTvWCwJJno',
+    pushProviderIdentifier: 'firebase-vendure-storefront'
 };
 
 /*

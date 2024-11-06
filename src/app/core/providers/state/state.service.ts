@@ -8,6 +8,9 @@ export interface AppState {
     lastCollectionSlug: string | null;
     mobileNavMenuIsOpen: boolean;
     cartDrawerOpen: boolean;
+    userId: string | null;
+    fcmDeviceTokens: string[];
+    deviceToken: string| null;
 }
 
 export const initialState: AppState = {
@@ -16,6 +19,9 @@ export const initialState: AppState = {
     lastCollectionSlug: null,
     mobileNavMenuIsOpen: false,
     cartDrawerOpen: false,
+    userId: null,
+    fcmDeviceTokens: [],
+    deviceToken: null,
 };
 
 /**
