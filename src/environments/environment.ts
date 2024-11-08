@@ -5,7 +5,7 @@
 export const environment = {
     production: false,
     // apiHost: 'http://vendure-dev.innity.com.my',
-    apiHost: 'http://localhost',
+    apiHost: 'http://vendure-dev.innity.com.my',
     apiPort: 3000,
     shopApiPath: 'shop-api',
     baseHref: '/',
