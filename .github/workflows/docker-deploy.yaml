@@ -1,0 +1,118 @@
+name: VPS Local Build and Deploy
+
+on:
+  push:
+    tags:
+      - "v[0-9]+\\.[0-9]+\\.[0-9]+-staging"
+      - "v[0-9]+\\.[0-9]+\\.[0-9]+-production"
+      - "v[0-9]+\\.[0-9]+\\.[0-9]+-local"
+  workflow_dispatch:
+
+jobs:
+  deploy-ubuntu:
+    if: ${{ contains(github.ref, '-production') || contains(github.ref, '-staging') }}
+    runs-on: ubuntu-latest
+    environment: ${{ contains(github.ref, '-production') && 'production' || contains(github.ref, '-staging') && 'staging' }}
+
+    steps:
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 2. Set environment based on branch
+        id: env_branch
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/tags/v"* ]]; then
+            if [[ "${GITHUB_REF}" == *"-production" ]]; then
+              echo "environment=production" >> $GITHUB_ENV
+            elif [[ "${GITHUB_REF}" == *"-staging" ]]; then
+              echo "environment=staging" >> $GITHUB_ENV
+            else
+              echo "Unknown environment, exiting."
+              exit 1
+            fi
+          else
+            echo "Not a version tag, exiting."
+            exit 1
+          fi
+        shell: bash
+
+      - name: 3. Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
+
+      - name: 4. Pull the latest code
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            cd ${{ vars.VPS_PATH }} &&
+            git fetch &&
+            git checkout ${{ github.ref_name == 'main' && 'main' || 'staging' }} &&
+            git pull origin ${{ github.ref_name == 'main' && 'main' || 'staging' }} 
+          "
+
+      - name: 5. Create .env file on VPS
+        env:
+          APP_ENV: ${{ secrets.APP_ENV }}
+          PORT: ${{ secrets.PORT }}
+          COOKIE_SECRET: ${{ secrets.COOKIE_SECRET }}
+          SUPERADMIN_USERNAME: ${{ secrets.SUPERADMIN_USERNAME }}
+          SUPERADMIN_PASSWORD: ${{ secrets.SUPERADMIN_PASSWORD }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          POPULATE_DATA: ${{ vars.POPULATE_DATA }}
+          DB_SCHEMA: ${{ secrets.DB_SCHEMA }}
+          NOVU_API_KEY: ${{ secrets.NOVU_API_KEY }}
+          NOVU_BRIDGE_TUNNEL: ${{ secrets.NOVU_BRIDGE_TUNNEL }}
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            echo 'APP_ENV=${APP_ENV}' > ${{ vars.VPS_PATH }}/.env &&
+            echo 'PORT=${PORT}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'COOKIE_SECRET=${COOKIE_SECRET}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'SUPERADMIN_USERNAME=${SUPERADMIN_USERNAME}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'SUPERADMIN_PASSWORD=${SUPERADMIN_PASSWORD}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'DATABASE_NAME=${DATABASE_NAME}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'DATABASE_HOST=${DATABASE_HOST}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'DATABASE_PORT=${DATABASE_PORT}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'DATABASE_USERNAME=${DATABASE_USERNAME}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'DATABASE_PASSWORD=${DATABASE_PASSWORD}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'POPULATE_DATA=${POPULATE_DATA}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'DB_SCHEMA=${DB_SCHEMA}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'NOVU_API_KEY=${NOVU_API_KEY}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'NOVU_BRIDGE_TUNNEL=${NOVU_BRIDGE_TUNNEL}' >> ${{ vars.VPS_PATH }}/.env
+          "
+
+      - name: 6. Build Docker images on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            cd ${{ vars.VPS_PATH }} &&
+            docker compose build
+          "
+
+      - name: 7. Restart services with new images on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            cd ${{ vars.VPS_PATH }} &&
+            docker compose down &&
+            docker compose up -d
+          "
+
+      - name: 8. Clean up unused Docker images on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            docker image prune -af
+          "
+
+      - name: 9. Remove old containers on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            docker container prune -f
+          "
+
+      - name: 10. Remove unused volumes on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            docker volume prune -f
+          "
