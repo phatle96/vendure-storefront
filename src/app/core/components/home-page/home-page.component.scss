@@ -2,3 +2,27 @@
     text-shadow: 0 0 7px rgb(255 67 67 / 60%), 0 0 13px rgb(30 9 9 / 56%)
 }
 
+:host ::ng-deep {
+    .p-sidebar .p-sidebar-header {
+        margin-left: auto;
+        padding: 0.5rem;
+    }
+
+    .p-sidebar .p-sidebar-content {
+        display: flex;
+        justify-content: center;
+        padding: 0.5rem;
+        height: 3rem;
+    }
+
+    .p-sidebar .p-sidebar-footer {
+        display: flex;
+        justify-content: center;
+        padding: 0.5rem;
+    }
+
+    .p-button .p-button-label {
+        padding: 0 3rem 0 3rem;
+    }
+
+}

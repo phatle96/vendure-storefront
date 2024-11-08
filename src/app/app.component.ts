@@ -7,10 +7,6 @@ import { GetCollectionsQuery, GetCollectionsQueryVariables } from './common/gene
 import { GET_COLLECTIONS } from './common/graphql/documents.graphql';
 import { DataService } from './core/providers/data/data.service';
 import { StateService } from './core/providers/state/state.service';
-import { NovuSocketService } from './core/services/novu-socket.service';
-
-
-import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'vsf-root',
@@ -42,8 +38,7 @@ export class AppComponent implements OnInit {
     constructor(private router: Router,
         private stateService: StateService,
         private dataService: DataService,
-        private novuSocketService: NovuSocketService,
-        private messageService: MessageService
+        // private fcmService: FcmService
     ) {
     }
 
@@ -59,6 +54,7 @@ export class AppComponent implements OnInit {
         }).pipe(
             map(({ collections }) => collections.items)
         );
+
     }
 
     openCartDrawer() {

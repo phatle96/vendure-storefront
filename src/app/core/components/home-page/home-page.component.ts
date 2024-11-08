@@ -8,6 +8,9 @@ import { environment } from '../../../../environments/environment';
 import { GetCollectionsQuery } from '../../../common/generated-types';
 import { DataService } from '../../providers/data/data.service';
 
+import { SidebarModule } from 'primeng/sidebar';
+import { FcmService } from '../../services/fcm.service';
+
 @Component({
     selector: 'vsf-home-page',
     templateUrl: './home-page.component.html',
@@ -18,8 +21,14 @@ export class HomePageComponent implements OnInit {
 
     collections$: Observable<GetCollectionsQuery['collections']['items']>;
     heroImage: SafeUrl;
+    sidebarVisible: boolean = true;
+    permission: string;
 
-    constructor(private dataService: DataService) {
+    constructor(
+        private dataService: DataService,
+        private fcmService: FcmService
+    ) {
+        this.permission = this.fcmService.permission
     }
 
     ngOnInit(): void {
