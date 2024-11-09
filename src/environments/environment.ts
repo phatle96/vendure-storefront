@@ -4,24 +4,23 @@
 
 export const environment = {
     production: false,
-    // apiHost: 'http://vendure-dev.innity.com.my',
-    apiHost: 'http://vendure-dev.innity.com.my',
+    apiHost: '',
     apiPort: 3000,
-    shopApiPath: 'shop-api',
-    baseHref: '/',
-    tokenMethod: 'bearer',
-    novuApplicationIdentifier: 's8ONsCGfYoUY',
+    shopApiPath: '',
+    baseHref: '',
+    tokenMethod: '',
+    novuApplicationIdentifier: '',
     firebaseConfig: {
-        apiKey: "AIzaSyBBBxnuQCVVXV_vR5YhPrwCS-n-iJ9ktk8",
-        authDomain: "vendure-app-demo.firebaseapp.com",
-        projectId: "vendure-app-demo",
-        storageBucket: "vendure-app-demo.firebasestorage.app",
-        messagingSenderId: "1012751272104",
-        appId: "1:1012751272104:web:99208b08353d836e83da9d",
-        measurementId: "G-ZE6GH5CP63"
+        apiKey: "",
+        authDomain: "",
+        projectId: "",
+        storageBucket: "",
+        messagingSenderId: "",
+        appId: "",
+        measurementId: ""
     },
-    vapid: 'BOYrCE0eSsMi2FXzA_A7za4qGGK6CX_RmNauyPocdyyoiWZlhls6B8YRnl0W1TWiJrN4xobuOXXyycTvWCwJJno',
-    pushProviderIdentifier: 'firebase-vendure-storefront'
+    vapid: '',
+    pushProviderIdentifier: ''
 };
 
 /*
