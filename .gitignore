@@ -2,3 +2,5 @@ node_modules
 .angular
 dist
 .firebase
+.env
+src/environments/*.ts
