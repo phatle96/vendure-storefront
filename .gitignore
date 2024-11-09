@@ -3,4 +3,4 @@ node_modules
 dist
 .firebase
 .env
-/src/environments
+src/environments
