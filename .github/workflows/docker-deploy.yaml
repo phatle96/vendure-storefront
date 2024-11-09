@@ -53,66 +53,45 @@ jobs:
       - name: 5. Create .env file on VPS
         env:
           APP_ENV: ${{ secrets.APP_ENV }}
-          PORT: ${{ secrets.PORT }}
-          COOKIE_SECRET: ${{ secrets.COOKIE_SECRET }}
-          SUPERADMIN_USERNAME: ${{ secrets.SUPERADMIN_USERNAME }}
-          SUPERADMIN_PASSWORD: ${{ secrets.SUPERADMIN_PASSWORD }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
-          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          POPULATE_DATA: ${{ vars.POPULATE_DATA }}
-          DB_SCHEMA: ${{ secrets.DB_SCHEMA }}
-          NOVU_API_KEY: ${{ secrets.NOVU_API_KEY }}
-          NOVU_BRIDGE_TUNNEL: ${{ secrets.NOVU_BRIDGE_TUNNEL }}
+          API_HOST: ${{ secrets.API_HOST }}
+          API_PORT: ${{ secrets.API_PORT }}
+          SHOP_API_PATH: ${{ secrets.SHOP_API_PATH }}
+          BASE_HREF: ${{ secrets.BASE_HREF }}
+          TOKEN_METHOD: ${{ secrets.TOKEN_METHOD }}
+          NOVU_APP_IDENTIFIER: ${{ secrets.NOVU_APP_IDENTIFIER }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          VAPID: ${{ secrets.VAPID }}
+          PUSH_PROVIDER_IDENTIFIER: ${{ secrets.PUSH_PROVIDER_IDENTIFIER }}
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             echo 'APP_ENV=${APP_ENV}' > ${{ vars.VPS_PATH }}/.env &&
-            echo 'PORT=${PORT}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'COOKIE_SECRET=${COOKIE_SECRET}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'SUPERADMIN_USERNAME=${SUPERADMIN_USERNAME}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'SUPERADMIN_PASSWORD=${SUPERADMIN_PASSWORD}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'DATABASE_NAME=${DATABASE_NAME}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'DATABASE_HOST=${DATABASE_HOST}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'DATABASE_PORT=${DATABASE_PORT}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'DATABASE_USERNAME=${DATABASE_USERNAME}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'DATABASE_PASSWORD=${DATABASE_PASSWORD}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'POPULATE_DATA=${POPULATE_DATA}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'DB_SCHEMA=${DB_SCHEMA}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'NOVU_API_KEY=${NOVU_API_KEY}' >> ${{ vars.VPS_PATH }}/.env &&
-            echo 'NOVU_BRIDGE_TUNNEL=${NOVU_BRIDGE_TUNNEL}' >> ${{ vars.VPS_PATH }}/.env
+            echo 'API_HOST=${API_HOST}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'API_PORT=${API_PORT}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'SHOP_API_PATH=${SHOP_API_PATH}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'BASE_HREF=${BASE_HREF}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'TOKEN_METHOD=${TOKEN_METHOD}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'NOVU_APP_IDENTIFIER=${NOVU_APP_IDENTIFIER}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'FIREBASE_API_KEY=${FIREBASE_API_KEY}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'FIREBASE_AUTH_DOMAIN=${FIREBASE_AUTH_DOMAIN}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'FIREBASE_MESSAGING_SENDER_ID=${FIREBASE_MESSAGING_SENDER_ID}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'FIREBASE_APP_ID=${FIREBASE_APP_ID}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'FIREBASE_MEASUREMENT_ID=${FIREBASE_MEASUREMENT_ID}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'VAPID=${VAPID}' >> ${{ vars.VPS_PATH }}/.env &&
+            echo 'PUSH_PROVIDER_IDENTIFIER=${PUSH_PROVIDER_IDENTIFIER}' >> ${{ vars.VPS_PATH }}/.env
           "
 
-      - name: 6. Build Docker images on VPS
+
+      - name: 6. Build the app
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             cd ${{ vars.VPS_PATH }} &&
-            docker compose build
-          "
-
-      - name: 7. Restart services with new images on VPS
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            cd ${{ vars.VPS_PATH }} &&
-            docker compose down &&
-            docker compose up -d
-          "
-
-      - name: 8. Clean up unused Docker images on VPS
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            docker image prune -af
-          "
-
-      - name: 9. Remove old containers on VPS
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            docker container prune -f
-          "
-
-      - name: 10. Remove unused volumes on VPS
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
-            docker volume prune -f
+            npm run build
           "
