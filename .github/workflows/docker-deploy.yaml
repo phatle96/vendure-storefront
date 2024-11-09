@@ -93,6 +93,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             cd ${{ vars.VPS_PATH }} &&
-            npm install --omit=dev --force &&
+            npm install --force &&
             npm run build
           "
