@@ -88,11 +88,36 @@ jobs:
             echo 'PUSH_PROVIDER_IDENTIFIER=${PUSH_PROVIDER_IDENTIFIER}' >> ${{ vars.VPS_PATH }}/.env
           "
 
-
-      - name: 6. Build the app
+      - name: 6. Build Docker images on VPS
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
             cd ${{ vars.VPS_PATH }} &&
-            npm install --force &&
-            npm run build
+            docker compose build
           "
+
+      - name: 7. Restart services with new images on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            cd ${{ vars.VPS_PATH }} &&
+            docker compose down &&
+            docker compose up -d
+          "
+
+      - name: 8. Clean up unused Docker images on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            docker image prune -af
+          "
+
+      - name: 9. Remove old containers on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            docker container prune -f
+          "
+
+      - name: 10. Remove unused volumes on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "
+            docker volume prune -f
+          "
+  
