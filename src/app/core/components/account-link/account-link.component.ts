@@ -9,7 +9,6 @@ import { StateService } from '../../providers/state/state.service';
 
 import { NovuSocketService } from '../../services/novu-socket.service';
 import { NovuApiService } from '../../services/novu-api.service';
-import { FcmService } from '../../services/fcm.service';
 import { ISuscriberQueryResponse } from '../../services/novu-api.type';
 import { environment } from 'src/environments/environment';
 
@@ -44,24 +43,36 @@ export class AccountLinkComponent implements OnInit {
                         if (!result.errors && result.data?.subscriberQuery) {
                             // Set user FCM device token
                             const channels = result.data.subscriberQuery.channels
-                            if (channels && channels.length > 0) {
+                            if (channels) {
                                 const fcmChannel = channels.filter((channel) => channel.providerId == "fcm")
-                                if (fcmChannel.length && fcmChannel[0].credentials) {
-                                    this.stateService.setState('fcmDeviceTokens', fcmChannel[0].credentials.deviceTokens!)
+
+                                if (fcmChannel.length) {
+                                    if (fcmChannel.length && fcmChannel[0].credentials) {
+                                        this.stateService.setState('fcmDeviceTokens', fcmChannel[0].credentials.deviceTokens!)
+                                        this.stateService.select(state => state.deviceToken).subscribe(
+                                            (deviceToken) => {
+                                                let tokens = fcmChannel[0].credentials?.deviceTokens
+                                                if (deviceToken && tokens?.length) {
+                                                    if (!tokens.includes(deviceToken)) {
+                                                        tokens = [...tokens.slice(-10), deviceToken]
+                                                        this.novuApiService.updateSubscriberCredentials(data.activeCustomer!.id, "fcm", tokens, environment.pushProviderIdentifier).subscribe()
+                                                    }
+                                                };
+                                            }
+                                        )
+                                    }
+
+                                } else {
                                     this.stateService.select(state => state.deviceToken).subscribe(
                                         (deviceToken) => {
-                                            let tokens = fcmChannel[0].credentials?.deviceTokens
-                                            if (deviceToken && tokens?.length) {
-                                                if (!tokens.includes(deviceToken)) {
-                                                    tokens = [...tokens.slice(-10), deviceToken]
-                                                    this.novuApiService.updateSubscriberCredentials(data.activeCustomer!.id, "fcm", tokens, environment.pushProviderIdentifier).subscribe()
-                                                }
-                                            }
+                                            if (deviceToken) {
+                                                const tokens = [deviceToken]
+                                                this.novuApiService.updateSubscriberCredentials(data.activeCustomer!.id, "fcm", tokens, environment.pushProviderIdentifier).subscribe();
+                                            };
                                         }
                                     )
                                 }
                             }
-
                         }
                     },
                     (error) => {
@@ -71,9 +82,15 @@ export class AccountLinkComponent implements OnInit {
             }
         });
 
-        this.activeCustomer$ = this.stateService.select(state => state.signedIn).pipe(
+        this.activeCustomer$ = this.stateService.select(state => {
+            state.signedIn;
+        }).pipe(
             switchMap(() => getActiveCustomer$),
-            map(data => data && data.activeCustomer),
+            map(data => {
+                if (data) {
+                    return data.activeCustomer
+                }
+            }),
         );
     }
 

@@ -102,7 +102,8 @@ export function apolloOptionsFactory(
     });
 
     const {apiHost, apiPort, shopApiPath} = environment;
-    const uri = `${apiHost}:${apiPort}/${shopApiPath}`;
+    //const uri = `${apiHost}:${apiPort}/${shopApiPath}`;
+    const uri = `${apiHost}${apiPort ? `:${apiPort}` : ''}/${shopApiPath}`;
     const options: Options = {
         uri,
         withCredentials: false,
