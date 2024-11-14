@@ -16,6 +16,7 @@ import { VerifyComponent } from './components/verify/verify.component';
 import { AccountGuard } from './providers/account.guard';
 import { SignInGuard } from './providers/sign-in.guard';
 import { AccountSignInComponent } from './components/account-sign-in/account-sign-in.component';
+import { accountResolver } from './resolves/account.resolver';
 
 export const routes: Routes = [
     {
@@ -27,6 +28,7 @@ export const routes: Routes = [
                 pathMatch: 'full',
                 canActivate: [AccountGuard],
                 component: AccountDashboardComponent,
+                resolve: {customerData: accountResolver}
             },
             {
                 path: 'orders',

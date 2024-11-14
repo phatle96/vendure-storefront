@@ -3,6 +3,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
 export interface AppState {
+    firstName: string | null;
+    lastName: string | null;
+    userEmail: string | null;
     signedIn: boolean;
     activeOrderId: string | null;
     lastCollectionSlug: string | null;
@@ -10,10 +13,13 @@ export interface AppState {
     cartDrawerOpen: boolean;
     userId: string | null;
     fcmDeviceTokens: string[];
-    deviceToken: string| null;
+    deviceToken: string | null;
 }
 
 export const initialState: AppState = {
+    firstName: null,
+    lastName: null,
+    userEmail: null,
     signedIn: false,
     activeOrderId: null,
     lastCollectionSlug: null,

@@ -3,7 +3,7 @@
     "extensions": {
         "endpoints": {
             "demo": "http://localhost:3000/shop-api",
-            "dev": "http://vendure-dev.innity.com.my:3000/shop-api"
+            "dev": "https://vendure-dev-api.innity.com.my/shop-api/"
         }
     }
 }
